@@ -51,18 +51,18 @@ exports.signin = async (req, res) => {
         success: false
       });
     }
-    const token = jwt.sign({ _id: user._id }, process.env.KEY_SECRET, {
+    const token =  jwt.sign({ _id: user._id }, process.env.KEY_SECRET, {
       expiresIn: "1d"
     });
     const refreshToken = jwt.sign({ _id: user._id }, process.env.KEY_REFRESH_TOKEN, {
       expiresIn: "30d"
     });
-    res.cookie("token", token, {
+    await res.cookie("token", token, {
       httpOnly: true,
       sameSite: "strict",
       secure: false
     });
-    res.json({
+    return res.status(200).json({
       message: "Login Success",
       accessToken: token,
       refreshToken: refreshToken,
