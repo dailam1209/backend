@@ -63,16 +63,14 @@ exports.search = async (req, res) => {
 
             if (subcategory && subcategory.length > 0) {
                 // matches = matches && product.subcategory.toLowerCase().includes(subcategory)
-                matches = matches && (Array.isArray(subcategory) ? subcategory.some(cate => product.subcategory.includes(cate)) : product.category.includes(subcategory));
+                matches = matches && (Array.isArray(subcategory) ? subcategory.some(cate => product.subcategory.includes(cate)  || product.title.includes(cate)) : product.category.includes(subcategory) || product.title.includes(subcategory));
             }
 
             if (to) {
                 const productPrice = product.price - (product.price * product.salePercentage / 100);
                 matches = matches && from <= productPrice && productPrice <= to;
-                console.log('productPrice', productPrice, matches)
             }
 
-            console.log('mastercolor', mastercolor, subcategory, to, from)
             if (mastercolor && mastercolor.length > 0) {
                 matches = matches && (Array.isArray(mastercolor) ? mastercolor.some(cate => product.color.includes(cate)) : product.color.includes(mastercolor));
             }

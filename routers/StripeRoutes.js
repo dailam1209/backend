@@ -4,21 +4,41 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const router = express.Router();
 
-router.post('/create-payment-intent', async (req, res) => {
+router.post('/create-checkout-session', async (req, res) => {
   try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: 2000, // Số tiền tính bằng cent (20.00 USD)
-      currency: 'usd',
+    const { amount, name, quantity } = req.body;
+    
+    // Convert amount to cents as Stripe expects amount in the smallest currency unit
+    const amountInCents = Math.round(amount * 100);
+
+    const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: name, // Replace with your product name
+            },
+            unit_amount: amountInCents,
+          },
+          quantity: quantity,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${req.headers.origin}/success`,
+      cancel_url: `${req.headers.origin}/cancel`,
     });
-    console.log('paymentIntent.client_secret', paymentIntent.client_secret)
+
     res.send({
-      clientSecret: paymentIntent.client_secret,
+      sessionId: session.url,
     });
   } catch (e) {
     res.status(500).send({ error: e.message });
   }
 });
+
+module.exports = router;
 
 router.post('/confirm-payment', async (req, res) => {
   const { paymentIntentId } = req.body;

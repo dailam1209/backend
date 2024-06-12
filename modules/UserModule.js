@@ -25,6 +25,14 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    phone: {
+        type: String, 
+        required: false,
+    },
+    address: {
+        type: String,
+        required: false,
+    },
     createdAt: {
 		type: Date,
 		default: Date.now
@@ -40,7 +48,7 @@ UserSchema.methods.comparePassword =  function (password) {
 };
 
 UserSchema.methods.generrateAuthToken = function () {
-    const token = jwt.sign({ _id: this._is },  process.env.KEY_SECRET , { expiresIn: '1d'});
+    const token = jwt.sign({ _id: this._id },  process.env.KEY_SECRET , { expiresIn: '1d'});
     return token
 };
 
