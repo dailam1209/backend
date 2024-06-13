@@ -6,42 +6,24 @@ const router = express.Router();
 
 router.post('/create-checkout-session', async (req, res) => {
   try {
-    // const { amount, name, quantity } = req.body;
+    const { amount, name, email } = req.body;
     
-    // Convert amount to cents as Stripe expects amount in the smallest currency unit
-    // const amountInCents = Math.round(amount * 100);
+   
     const api = await stripe.paymentIntents.create({
-      amount: 2000,
+      amount: amount,
       currency: 'usd',
       automatic_payment_methods: {
         enabled: true,
       },
+      metadata: {
+        customer_name: name,
+        customer_email: email
+      }
     });
     res.send({
       idInitSecret: api
     })
-    // const session = await stripe.checkout.sessions.create({
-    //   payment_method_types: ['card'],
-    //   line_items: [
-    //     {
-    //       price_data: {
-    //         currency: 'usd',
-    //         product_data: {
-    //           name: name, // Replace with your product name
-    //         },
-    //         unit_amount: amountInCents,
-    //       },
-    //       quantity: quantity,
-    //     },
-    //   ],
-    //   mode: 'payment',
-    //   success_url: `${req.headers.origin}/success`,
-    //   cancel_url: `${req.headers.origin}/cancel`,
-    // });
-
-    // res.send({
-    //   sessionId: session.url,
-    // });
+   
   } catch (e) {
     res.status(500).send({ error: e.message });
   }
